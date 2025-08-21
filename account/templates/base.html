@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <style>
+        form p {
+            padding-top: 14px;
+        }
+        form label {
+            font-size: 1rem;
+            padding-bottom: 4px;
+            display: block;
+            font-weight: 700;
+        }
+        form input {
+            background: #efefef;
+            padding: 4px 8px;
+        }
+        form input[type='file'] {
+            background: #ddd;
+            color: #000;
+        }
+        form input[type='submit'] {
+            background: green;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top:16px;
+        }
+
+    </style>
+</head>
+<body>
+<header class="flex justify-between py-4 px-4 bg-green-600 text-white text-sm">
+    <span class="font-bold uppercase">Bookmarks</span>
+
+    {% if request.user.is_authenticated %}
+        <ul class="flex gap-6 w-2/3 justify-center">
+            <li {% if section == 'dashboard' %} class="selected" {% endif %}>
+                <a href="{% url 'dashboard' %}">My dashboard</a>
+            </li>
+            <li {% if section == 'images' %} class="selected" {% endif %}>
+                <a href="#">Images</a>
+            </li>
+            <li {% if section == 'people' %} class="selected" {% endif %}>
+                <a href="#">People</a>
+            </li>
+        </ul>
+    {% endif %}
+
+    <div class="flex gap-4">
+        {% if request.user.is_authenticated %}
+            Hello {{ request.user.first_name|default:request.user.username }},
+            <form action="{% url 'logout' %}" method="post">
+                <button class="font-bold">Logout</button>
+                {% csrf_token %}
+            </form>
+        {% else %}
+            <a class="font-bold" href="{% url 'login' %}">Log-in</a>
+        {% endif %}
+    </div>
+</header>
+{% if messages %}
+    <ul class="messages [ border-b-[1px] border-b-gray-300 p-4 ]">
+        {% for message in messages %}
+        <li class="{{ message.tags }} [ flex justify-between ]">
+            {{ message|safe }}
+            <a href="#">x</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<div class="px-4">
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>

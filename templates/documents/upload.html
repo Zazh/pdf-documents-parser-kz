@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить документ - PDF Parser{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-cloud-upload"></i> Загрузить удостоверение личности
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+                    
+                    <div class="text-center mb-4">
+                        <i class="bi bi-cloud-upload display-1 text-muted mb-3"></i>
+                        <h5>Выберите PDF файл удостоверения личности</h5>
+                        <p class="text-muted">Поддерживается только PDF формат, максимум 10 МБ</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-grid">
+                            <label for="{{ form.pdf_file.id_for_label }}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-file-earmark-pdf"></i> Выбрать PDF файл
+                            </label>
+                            {{ form.pdf_file }}
+                        </div>
+                        <div id="fileInfo" class="mt-2 text-center" style="display: none;"></div>
+                    </div>
+
+                    {% if form.pdf_file.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.pdf_file.errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                            <i class="bi bi-upload"></i> Загрузить и обработать
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-4" id="progressArea" style="display: none;">
+                    <div class="progress mb-2">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted">Обрабатываем документ...</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="{% url 'document_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-list"></i> Посмотреть все документы
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('id_pdf_file');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressArea = document.getElementById('progressArea');
+    const fileInfo = document.getElementById('fileInfo');
+
+    // Скрываем стандартный input
+    fileInput.style.display = 'none';
+
+    // Обработка выбора файла
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            const fileName = file.name;
+            const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' МБ';
+
+            // Проверяем тип файла
+            if (file.type !== 'application/pdf' && !fileName.toLowerCase().endsWith('.pdf')) {
+                fileInfo.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Неправильный тип файла. Выберите PDF файл.
+                    </div>
+                `;
+                fileInfo.style.display = 'block';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            // Показываем информацию о файле
+            fileInfo.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i>
+                    <strong>${fileName}</strong> (${fileSize})
+                </div>
+            `;
+            fileInfo.style.display = 'block';
+            submitBtn.disabled = false;
+        } else {
+            fileInfo.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    });
+
+    // Обработка отправки формы
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Обрабатываем документ...';
+        progressArea.style.display = 'block';
+
+        // Прогресс бар
+        let progress = 0;
+        const progressBar = document.querySelector('.progress-bar');
+        const interval = setInterval(function() {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+            
+            if (progress >= 90) {
+                clearInterval(interval);
+            }
+        }, 500);
+    });
+});
+</script>
+{% endblock %}

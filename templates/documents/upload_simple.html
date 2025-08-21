@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить документ (простая версия){% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Тест загрузки PDF</h4>
+            </div>
+            <div class="card-body">
+                <!-- Простая форма без JavaScript -->
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.pdf_file.id_for_label }}" class="form-label">
+                            Выберите PDF файл:
+                        </label>
+                        {{ form.pdf_file }}
+                        {% if form.pdf_file.errors %}
+                            <div class="text-danger">
+                                {{ form.pdf_file.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Загрузить PDF
+                    </button>
+                </form>
+
+                <!-- Отладочная информация -->
+                <div class="mt-4">
+                    <h6>Отладка:</h6>
+                    <small class="text-muted">
+                        <div>Метод: {{ request.method }}</div>
+                        <div>POST данные: {{ request.POST }}</div>
+                        <div>FILES: {{ request.FILES }}</div>
+                        {% if form.errors %}
+                            <div class="text-danger">Ошибки формы: {{ form.errors }}</div>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

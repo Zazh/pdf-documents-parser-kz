@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+
+{% block title %}Документ #{{ document.id }} - PDF Parser{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-file-earmark-text"></i> Документ #{{ document.id }}
+                </h4>
+                <small>{{ document.created_at|date:"d.m.Y H:i" }}</small>
+            </div>
+            
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>Извлеченные данные:</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="text-primary">👤 Личные данные</h6>
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td><strong>Фамилия:</strong></td>
+                                        <td>
+                                            {% if document.last_name %}
+                                                <span class="badge bg-success">{{ document.last_name }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Не найдено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Имя:</strong></td>
+                                        <td>
+                                            {% if document.first_name %}
+                                                <span class="badge bg-success">{{ document.first_name }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Не найдено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Отчество:</strong></td>
+                                        <td>
+                                            {% if document.patronymic %}
+                                                <span class="badge bg-success">{{ document.patronymic }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Не найдено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Дата рождения:</strong></td>
+                                        <td>
+                                            {% if document.birth_date %}
+                                                <code class="bg-light p-1 rounded">{{ document.birth_date }}</code>
+                                            {% else %}
+                                                <span class="text-muted">Не найдена</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>ИИН:</strong></td>
+                                        <td>
+                                            {% if document.iin %}
+                                                <code class="bg-light p-2 rounded">{{ document.iin }}</code>
+                                            {% else %}
+                                                <span class="text-muted">Не найден</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Место рождения:</strong></td>
+                                        <td>
+                                            {% if document.birth_place %}
+                                                <span class="badge bg-info">{{ document.birth_place }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Не найдено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Национальность:</strong></td>
+                                        <td>
+                                            {% if document.nationality %}
+                                                <span class="badge bg-secondary">{{ document.nationality }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Не найдена</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-12">
+                                <h6 class="text-warning">📄 Данные документа</h6>
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td><strong>Номер документа:</strong></td>
+                                        <td>
+                                            {% if document.document_number %}
+                                                <code class="bg-light p-1 rounded">{{ document.document_number }}</code>
+                                            {% else %}
+                                                <span class="text-muted">Не найден</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Кем выдан:</strong></td>
+                                        <td>
+                                            {% if document.issued_by %}
+                                                <small class="text-dark">{{ document.issued_by }}</small>
+                                            {% else %}
+                                                <span class="text-muted">Не найдено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Дата выдачи:</strong></td>
+                                        <td>
+                                            {% if document.issue_date %}
+                                                <code class="bg-light p-1 rounded">{{ document.issue_date }}</code>
+                                            {% else %}
+                                                <span class="text-muted">Не найдена</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Дата окончания:</strong></td>
+                                        <td>
+                                            {% if document.expiry_date %}
+                                                <code class="bg-light p-1 rounded">{{ document.expiry_date }}</code>
+                                            {% else %}
+                                                <span class="text-muted">Не найдена</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        {% if document.pdf_file %}
+                            <div class="mt-4">
+                                <h6>Исходный файл:</h6>
+                                <a href="{{ document.pdf_file.url }}" target="_blank" class="btn btn-outline-secondary">
+                                    <i class="bi bi-file-pdf"></i> Открыть PDF
+                                </a>
+                                <small class="text-muted d-block mt-2">
+                                    Файл: {{ document.pdf_file.name|cut:"pdfs/" }}
+                                </small>
+                            </div>
+                        {% endif %}
+
+                        <!-- Кнопка для показа отладочной информации -->
+<!--                        <div class="mt-4">-->
+<!--                            <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#debugInfo">-->
+<!--                                <i class="bi bi-bug"></i> Показать отладочную информацию-->
+<!--                            </button>-->
+<!--                            <div class="collapse mt-2" id="debugInfo">-->
+<!--                                <div class="card card-body bg-light">-->
+<!--                                    <small>-->
+<!--                                        <strong>Извлеченный текст из PDF:</strong><br>-->
+<!--                                        <pre style="white-space: pre-wrap; font-size: 11px;">{{ document.raw_text|default:"Нет данных" }}</pre>-->
+<!--                                    </small>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                    </div>
+
+                    <div class="col-md-4">
+                        {% if document.photo %}
+                            <h6>Извлеченное фото:</h6>
+                            <div class="text-center">
+                                <img src="{{ document.photo.url }}" alt="Фото из документа"
+                                     class="img-fluid photo-preview">
+                                <div class="mt-2">
+                                    <a href="{{ document.photo.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-zoom-in"></i> Увеличить
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted">
+                                <i class="bi bi-image display-4 mb-2"></i>
+                                <p>Фото не извлечено</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-gear"></i> Действия</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'upload_document' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Загрузить новый
+                    </a>
+                    <a href="{% url 'document_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list"></i> Все документы
+                    </a>
+                    <a href="{% url 'admin:documents_document_change' document.pk %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Статистика извлечения</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>Фамилия:</span>
+                                <span>
+                                    {% if document.last_name %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Имя:</span>
+                                <span>
+                                    {% if document.first_name %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Отчество:</span>
+                                <span>
+                                    {% if document.patronymic %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Дата рождения:</span>
+                                <span>
+                                    {% if document.birth_date %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>ИИН:</span>
+                                <span>
+                                    {% if document.iin %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Фото:</span>
+                                <span>
+                                    {% if document.photo %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>Место рождения:</span>
+                                <span>
+                                    {% if document.birth_place %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Национальность:</span>
+                                <span>
+                                    {% if document.nationality %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Номер документа:</span>
+                                <span>
+                                    {% if document.document_number %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Кем выдан:</span>
+                                <span>
+                                    {% if document.issued_by %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Дата выдачи:</span>
+                                <span>
+                                    {% if document.issue_date %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Дата окончания:</span>
+                                <span>
+                                    {% if document.expiry_date %}
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a href="{% url 'document_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Назад к списку
+    </a>
+</div>
+{% endblock %}
