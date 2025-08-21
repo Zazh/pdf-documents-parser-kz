@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 import os
@@ -268,4 +268,10 @@ def test_jpg_parsing(request):
 
 
 def home(request):
-    return HttpResponse("ok")
+    """
+    Главная страница
+    """
+    if request.user.is_authenticated:
+        return redirect('upload_document')
+    else:
+        return render(request, 'documents/upload.html')
