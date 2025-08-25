@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Document(models.Model):
@@ -6,6 +7,12 @@ class Document(models.Model):
     pdf_file = models.FileField(upload_to='pdfs/', verbose_name="PDF файл")
     jpg_file = models.ImageField(upload_to='jpgs/', blank=True, null=True, verbose_name="JPG изображение")
 
+    # Дата экзамена
+    test_date = models.DateTimeField(
+        verbose_name="Дата тестирования",
+        default=timezone.now,
+        db_index=True,
+    )
     # Основные данные
     first_name = models.CharField(max_length=100, blank=True, verbose_name="Имя")
     last_name = models.CharField(max_length=100, blank=True, verbose_name="Фамилия")

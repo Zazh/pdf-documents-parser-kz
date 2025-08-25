@@ -33,27 +33,21 @@ def convert_pdf_to_jpg(pdf_path: str, dpi: int = 220) -> Optional[str]:
 
 def extract_data_from_pdf(pdf_path: str) -> Dict:
     """
-    Высокоуровневая функция: PDF -> JPG -> координатный OCR.
-    Никакого поиска по тексту — только ROI.
+    PDF -> JPG -> координатный OCR (только Фамилия, Имя, Отчество, ИИН).
     """
-    result = {
-        'first_name': '', 'last_name': '', 'patronymic': '',
-        'birth_date': '', 'iin': '', 'birth_place': '',
-        'nationality': '', 'issued_by': '', 'issue_date': '',
-        'expiry_date': '', 'document_number': '',
-        'photo': None, 'raw_text': ''
-    }
+    result = {'first_name': '', 'last_name': '', 'patronymic': '', 'iin': '', 'photo': None}
 
     jpg_path = convert_pdf_to_jpg(pdf_path)
     if not jpg_path:
         return result
 
     try:
-        # импортируем локально, чтобы избежать циклических импортов
         from .jpg_parser import extract_data_from_jpg_coordinates
         coord_result = extract_data_from_jpg_coordinates(jpg_path)
         if coord_result:
-            result.update(coord_result)
+            # оставим только нужные
+            for k in ('first_name', 'last_name', 'patronymic', 'iin', 'photo'):
+                result[k] = coord_result.get(k, result.get(k))
     except Exception:
         logger.exception("extract_data_from_pdf: coordinate parser failed")
 
@@ -61,9 +55,11 @@ def extract_data_from_pdf(pdf_path: str) -> Dict:
 
 
 def extract_data_from_image(image_path: str) -> Dict:
-    """
-    Если приходит уже JPG/PNG — сразу координатный парсер.
-    Удобная обёртка, чтобы не плодить дубли в коде.
-    """
     from .jpg_parser import extract_data_from_jpg_coordinates
-    return extract_data_from_jpg_coordinates(image_path)
+    coord_result = extract_data_from_jpg_coordinates(image_path)
+    return {
+        'first_name': coord_result.get('first_name', ''),
+        'last_name': coord_result.get('last_name', ''),
+        'patronymic': coord_result.get('patronymic', ''),
+        'iin': coord_result.get('iin', '')
+    }

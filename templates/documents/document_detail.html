@@ -8,7 +8,7 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">
-                    <i class="bi bi-file-earmark-text"></i> Документ #{{ document.id }}
+                    <i class="bi bi-file-earmark-text"></i> Номер кандидата #{{ document.id }}
                 </h4>
                 <small>{{ document.created_at|date:"d.m.Y H:i" }}</small>
             </div>
@@ -16,7 +16,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-8">
-                        <h5>Извлеченные данные:</h5>
+<!--                        <h5>Данные:</h5>-->
                         
                         <div class="row">
                             <div class="col-md-12">
@@ -52,16 +52,16 @@
                                             {% endif %}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td><strong>Дата рождения:</strong></td>
-                                        <td>
-                                            {% if document.birth_date %}
-                                                <code class="bg-light p-1 rounded">{{ document.birth_date }}</code>
-                                            {% else %}
-                                                <span class="text-muted">Не найдена</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
+<!--                                    <tr>-->
+<!--                                        <td><strong>Дата рождения:</strong></td>-->
+<!--                                        <td>-->
+<!--                                            {% if document.birth_date %}-->
+<!--                                                <code class="bg-light p-1 rounded">{{ document.birth_date }}</code>-->
+<!--                                            {% else %}-->
+<!--                                                <span class="text-muted">Не найдена</span>-->
+<!--                                            {% endif %}-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
                                     <tr>
                                         <td><strong>ИИН:</strong></td>
                                         <td>
@@ -72,67 +72,37 @@
                                             {% endif %}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td><strong>Место рождения:</strong></td>
-                                        <td>
-                                            {% if document.birth_place %}
-                                                <span class="badge bg-info">{{ document.birth_place }}</span>
-                                            {% else %}
-                                                <span class="text-muted">Не найдено</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Национальность:</strong></td>
-                                        <td>
-                                            {% if document.nationality %}
-                                                <span class="badge bg-secondary">{{ document.nationality }}</span>
-                                            {% else %}
-                                                <span class="text-muted">Не найдена</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
+<!--                                    <tr>-->
+<!--                                        <td><strong>Место рождения:</strong></td>-->
+<!--                                        <td>-->
+<!--                                            {% if document.birth_place %}-->
+<!--                                                <span class="badge bg-info">{{ document.birth_place }}</span>-->
+<!--                                            {% else %}-->
+<!--                                                <span class="text-muted">Не найдено</span>-->
+<!--                                            {% endif %}-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td><strong>Национальность:</strong></td>-->
+<!--                                        <td>-->
+<!--                                            {% if document.nationality %}-->
+<!--                                                <span class="badge bg-secondary">{{ document.nationality }}</span>-->
+<!--                                            {% else %}-->
+<!--                                                <span class="text-muted">Не найдена</span>-->
+<!--                                            {% endif %}-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
                                 </table>
                             </div>
 
                             <div class="col-md-12">
-                                <h6 class="text-warning">📄 Данные документа</h6>
+                                <h6 class="text-warning">📄 Данные тестирования</h6>
                                 <table class="table table-borderless table-sm">
                                     <tr>
-                                        <td><strong>Номер документа:</strong></td>
+                                        <td><strong>Дата:</strong></td>
                                         <td>
-                                            {% if document.document_number %}
-                                                <code class="bg-light p-1 rounded">{{ document.document_number }}</code>
-                                            {% else %}
-                                                <span class="text-muted">Не найден</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Кем выдан:</strong></td>
-                                        <td>
-                                            {% if document.issued_by %}
-                                                <small class="text-dark">{{ document.issued_by }}</small>
-                                            {% else %}
-                                                <span class="text-muted">Не найдено</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Дата выдачи:</strong></td>
-                                        <td>
-                                            {% if document.issue_date %}
-                                                <code class="bg-light p-1 rounded">{{ document.issue_date }}</code>
-                                            {% else %}
-                                                <span class="text-muted">Не найдена</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Дата окончания:</strong></td>
-                                        <td>
-                                            {% if document.expiry_date %}
-                                                <code class="bg-light p-1 rounded">{{ document.expiry_date }}</code>
+                                            {% if document.test_date %}
+                                                <code class="bg-light p-1 rounded">{{ document.test_date }}</code>
                                             {% else %}
                                                 <span class="text-muted">Не найдена</span>
                                             {% endif %}
@@ -172,7 +142,6 @@
 
                     <div class="col-md-4">
                         {% if document.photo %}
-                            <h6>Извлеченное фото:</h6>
                             <div class="text-center">
                                 <img src="{{ document.photo.url }}" alt="Фото из документа"
                                      class="img-fluid photo-preview">
@@ -211,6 +180,42 @@
                         <i class="bi bi-pencil"></i> Редактировать
                     </a>
                 </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Дата тестирования</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <div class="row">
+                        <div class="col-12">
+                            <form method="post" action="{% url 'set_test_date' document.pk %}" class="row g-2 align-items-end">
+                              {% csrf_token %}
+                              <div class="col-12">
+                                <label for="testDateInput" class="form-label">Выберите дату и время</label>
+                                <input
+                                  type="datetime-local"
+                                  class="form-control"
+                                  id="testDateInput"
+                                  name="test_date"
+                                  value="{{ document.test_date|date:'Y-m-d\\TH:i' }}"
+                                  required
+                                >
+                                <div class="form-text">
+                                  Текущая: {{ document.test_date|date:"d.m.Y H:i" }}{% if not document.test_date %} — не задана{% endif %}
+                                </div>
+                              </div>
+                              <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                  <i class="bi bi-save"></i> Сохранить
+                                </button>
+                              </div>
+                            </form>
+                        </div>
+                    </div>
+                </small>
             </div>
         </div>
 
