@@ -112,17 +112,22 @@
                             </div>
                         </div>
 
-                        {% if document.pdf_file %}
-                            <div class="mt-4">
-                                <h6>Исходный файл:</h6>
+                        <div class="row">
+                            {% if document.pdf_file %}
+                            <div class="mt-4 col-4">
                                 <a href="{{ document.pdf_file.url }}" target="_blank" class="btn btn-outline-secondary">
                                     <i class="bi bi-file-pdf"></i> Открыть PDF
                                 </a>
-                                <small class="text-muted d-block mt-2">
-                                    Файл: {{ document.pdf_file.name|cut:"pdfs/" }}
-                                </small>
                             </div>
-                        {% endif %}
+                            {% endif %}
+                            <div class="mt-4 col-4">
+                                <a href="{% url 'document_export_pdf' document.pk %}" class="btn btn-outline-success">
+                                  <i class="bi bi-filetype-pdf"></i> Выгрузить PDF
+                                </a>
+                            </div>
+                        </div>
+
+
 
                         <!-- Кнопка для показа отладочной информации -->
 <!--                        <div class="mt-4">-->
@@ -219,141 +224,141 @@
             </div>
         </div>
 
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Статистика извлечения</h6>
-            </div>
-            <div class="card-body">
-                <small class="text-muted">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="d-flex justify-content-between">
-                                <span>Фамилия:</span>
-                                <span>
-                                    {% if document.last_name %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Имя:</span>
-                                <span>
-                                    {% if document.first_name %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Отчество:</span>
-                                <span>
-                                    {% if document.patronymic %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Дата рождения:</span>
-                                <span>
-                                    {% if document.birth_date %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>ИИН:</span>
-                                <span>
-                                    {% if document.iin %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Фото:</span>
-                                <span>
-                                    {% if document.photo %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="d-flex justify-content-between">
-                                <span>Место рождения:</span>
-                                <span>
-                                    {% if document.birth_place %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Национальность:</span>
-                                <span>
-                                    {% if document.nationality %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Номер документа:</span>
-                                <span>
-                                    {% if document.document_number %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Кем выдан:</span>
-                                <span>
-                                    {% if document.issued_by %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Дата выдачи:</span>
-                                <span>
-                                    {% if document.issue_date %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Дата окончания:</span>
-                                <span>
-                                    {% if document.expiry_date %}
-                                        <i class="bi bi-check-circle text-success"></i>
-                                    {% else %}
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </small>
-            </div>
-        </div>
+<!--        <div class="card mt-3">-->
+<!--            <div class="card-header">-->
+<!--                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Статистика извлечения</h6>-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--                <small class="text-muted">-->
+<!--                    <div class="row">-->
+<!--                        <div class="col-6">-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Фамилия:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.last_name %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Имя:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.first_name %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Отчество:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.patronymic %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Дата рождения:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.birth_date %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>ИИН:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.iin %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Фото:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.photo %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="col-6">-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Место рождения:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.birth_place %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Национальность:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.nationality %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Номер документа:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.document_number %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Кем выдан:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.issued_by %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Дата выдачи:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.issue_date %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <span>Дата окончания:</span>-->
+<!--                                <span>-->
+<!--                                    {% if document.expiry_date %}-->
+<!--                                        <i class="bi bi-check-circle text-success"></i>-->
+<!--                                    {% else %}-->
+<!--                                        <i class="bi bi-x-circle text-danger"></i>-->
+<!--                                    {% endif %}-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </small>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </div>
 

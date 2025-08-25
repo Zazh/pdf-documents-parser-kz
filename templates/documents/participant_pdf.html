@@ -1,0 +1,185 @@
+<!doctype html>
+{% load static %}
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <style>
+    /* Шрифт для кириллицы */
+    @font-face {
+      font-family: "Helvetica Neue";
+      src: url("{% static 'fonts/HelveticaNeue-Roman.otf' %}");
+    }
+    @font-face {
+      font-family: "Helvetica Neue";
+      src: url("{% static 'fonts/HelveticaNeue-Bold.otf' %}");
+      font-weight: bold;
+    }
+
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      font-size: 11pt;
+      color: #2c3e50;
+      background: #ffffff;
+      padding: 0;
+      margin: 0;
+    }
+
+    .no-ul {
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+    .no-ul li {
+      list-style-type: none;
+      display: flex;
+      padding-bottom: 1rem;
+    }
+
+    .wrap {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: #0d6efd;
+      color: #fff;
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid #ccc;
+
+    }
+
+    .photo {
+      width:100%;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .title {
+      width: 40%;
+      font-weight: bold;
+      color: #595959;
+    }
+    .value {
+      width: 60%;
+      font-weight: bold;
+      font-size: .75rem;
+
+    }
+    .p-block {
+      padding: .4rem .4rem;
+      background-color: #ededed;
+      border-radius: 6px;
+      color: #d63384;
+      line-height: 1;
+    }
+    .bg-green {
+      background-color: #198754!important;
+      color: #fff;
+    }
+
+  </style>
+  <title>{{ document.last_name }} {{ document.first_name }} – #{{ document.id }} </title>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <span style="font-size:1.2rem;font-weight:700;">Регистрационная карта на прохождение тестирования #{{ document.id }}</span>
+  </div>
+  <div style="display:flex;">
+    <div style="width:70%;">
+      <ul class="no-ul">
+        <li>
+          <span class="title">Фамилия:</span>
+          <span class="value">
+            <span class="p-block bg-green">{% if document.last_name %}{{ document.last_name|upper }}{% else %}—{% endif %}</span>
+          </span>
+        </li>
+        <li>
+          <span class="title">Имя:</span>
+          <span class="value">
+            <span class="p-block bg-green">
+              {% if document.first_name %}{{ document.first_name|upper }}{% else %}—{% endif %}
+            </span>
+          </span>
+        </li>
+        <li>
+          <span class="title">Отчество:</span>
+          <span class="value">
+            <span class="p-block bg-green">
+              {% if document.patronymic %}{{ document.patronymic|upper }}{% else %}—{% endif %}
+            </span>
+          </span>
+        </li>
+        <li>
+          <span class="title">ИИН:</span>
+          <span class="value">
+            <span class="p-block">
+              {% if document.iin %}{{ document.iin|upper }}{% else %}—{% endif %}
+            </span>
+          </span>
+        </li>
+        <li style="font-size: 1.2rem;font-weight:bold; padding:1.5rem 0 1.75rem;">Данные о тестировании</li>
+        <li style="align-items:center; display:flex;">
+          <span class="title" style="display: flex; gap:.5rem; align-items:center;">
+            <span>
+              <svg fill="#d63384" width="18px" height="18px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6,22H18a3,3,0,0,0,3-3V7a2,2,0,0,0-2-2H17V3a1,1,0,0,0-2,0V5H9V3A1,1,0,0,0,7,3V5H5A2,2,0,0,0,3,7V19A3,3,0,0,0,6,22ZM5,12.5a.5.5,0,0,1,.5-.5h13a.5.5,0,0,1,.5.5V19a1,1,0,0,1-1,1H6a1,1,0,0,1-1-1Z"/></svg>
+            </span>
+            <span>
+              Дата:
+            </span>
+          </span>
+          <span class="value">
+            <span class="p-block">
+              {% if document.test_date %}
+                {{ document.test_date|date:"d" }}
+                {% if document.test_date|date:"m" == "01" %}января
+                {% elif document.test_date|date:"m" == "02" %}февраля
+                {% elif document.test_date|date:"m" == "03" %}марта
+                {% elif document.test_date|date:"m" == "04" %}апреля
+                {% elif document.test_date|date:"m" == "05" %}мая
+                {% elif document.test_date|date:"m" == "06" %}июня
+                {% elif document.test_date|date:"m" == "07" %}июля
+                {% elif document.test_date|date:"m" == "08" %}августа
+                {% elif document.test_date|date:"m" == "09" %}сентября
+                {% elif document.test_date|date:"m" == "10" %}октября
+                {% elif document.test_date|date:"m" == "11" %}ноября
+                {% elif document.test_date|date:"m" == "12" %}декабря
+                {% endif %}
+                {{ document.test_date|date:"Y" }} г.
+              {% else %}—{% endif %}
+            </span>
+          </span>
+        </li>
+        <li style="align-items:center; display:flex;">
+          <span class="title" style="display: flex; gap:.5rem; align-items:center;">
+            <span>
+              <svg fill="#d63384" width="18px" height="18px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,4.625A7.993,7.993,0,0,0,5.729,17.583a.78.78,0,0,0-.092.062L3.043,20.271a1.021,1.021,0,0,0,0,1.432.99.99,0,0,0,1.414,0l2.594-2.626a.975.975,0,0,0,.076-.117,7.962,7.962,0,0,0,9.745,0,1.027,1.027,0,0,0,.077.117L19.543,21.7a.99.99,0,0,0,1.414,0,1.021,1.021,0,0,0,0-1.432l-2.594-2.626c-.027-.027-.063-.038-.092-.062A7.993,7.993,0,0,0,12,4.625Zm4,9H12a1,1,0,0,1-1-1v-4.8a1,1,0,1,1,2,0v3.8h3a1,1,0,0,1,0,2ZM2.293,6.767a1.021,1.021,0,0,1,0-1.432l3-3.038a.99.99,0,0,1,1.414,0,1.021,1.021,0,0,1,0,1.432l-3,3.038a.992.992,0,0,1-1.414,0ZM21.707,5.335a1.021,1.021,0,0,1,0,1.432.992.992,0,0,1-1.414,0l-3-3.038a1.021,1.021,0,0,1,0-1.432.99.99,0,0,1,1.414,0Z"/></svg>
+            </span>
+            <span>
+              Время:
+            </span>
+          </span>
+          <span class="value">
+            <span class="p-block">
+              {% if document.test_date %}{{ document.test_date|date:"H:i" }}{% else %}—{% endif %}
+            </span>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div style="width:30%;">
+      <div style="padding: 1rem;">
+        {% if document.photo %}
+          <img src="{{ document.photo.url }}" alt="Фото" class="photo" />
+        {% else %}
+            <span>Нет фотографии</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

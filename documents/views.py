@@ -1,14 +1,21 @@
+from urllib.parse import quote
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
 from datetime import datetime
-
+from django.conf import settings
+from weasyprint import HTML, CSS
+from weasyprint import default_url_fetcher
+from django.template.loader import get_template
 import os
+from pathlib import Path
+from io import BytesIO
 
 from django.views.decorators.http import require_POST
 
@@ -278,6 +285,91 @@ def set_test_date(request, pk):
     messages.success(request, 'Дата тестирования обновлена.')
     return redirect('document_detail', pk=pk)
 
+def weasy_url_fetcher(url: str):
+    """
+    Аналог link_callback для WeasyPrint.
+    Превращает /static/... и /media/... в файловые пути.
+    Остальное отдаём дефолтному fetcher'у (HTTP, data URI и т.д.).
+    """
+    static_url = (settings.STATIC_URL or "/static/").rstrip("/") + "/"
+    media_url = (settings.MEDIA_URL or "/media/").rstrip("/") + "/"
+
+    if url.startswith(static_url):
+        rel = url[len(static_url):]
+        # STATIC_ROOT обязателен для этого варианта (делай collectstatic в prod)
+        static_root = settings.STATIC_ROOT or str(Path(settings.BASE_DIR) / "staticfiles")
+        abs_path = os.path.join(static_root, rel)
+        if not os.path.isfile(abs_path):
+            raise FileNotFoundError(f"Static not found: {url} -> {abs_path}")
+        return {"file_obj": open(abs_path, "rb")}
+
+    if url.startswith(media_url):
+        rel = url[len(media_url):]
+        media_root = settings.MEDIA_ROOT or str(Path(settings.BASE_DIR) / "media")
+        abs_path = os.path.join(media_root, rel)
+        if not os.path.isfile(abs_path):
+            raise FileNotFoundError(f"Media not found: {url} -> {abs_path}")
+        return {"file_obj": open(abs_path, "rb")}
+
+    # относительные URL (без / в начале) будут резолвиться через base_url
+    return default_url_fetcher(url)
+
+
+@login_required
+def document_export_pdf(request, pk):
+    document = get_object_or_404(Document, pk=pk)
+
+    # 1) контекст с данными
+    context = {
+        "document": document,
+    }
+
+    # 2) рендерим HTML
+    template = get_template("documents/participant_pdf.html")
+    html_string = template.render(context, request)
+
+    # 3) базовый URL: можно оставить корень сайта — относительные пути подхватятся
+    #    (а абсолютные /static/... и /media/... поймает weasy_url_fetcher)
+    base_url = request.build_absolute_uri("/")
+
+    # 4) дополнительный CSS (общие настройки страницы/шрифта)
+    extra_css = CSS(string="""
+        @page { size: A4; margin: 15mm; }
+        body { font-family: 'DejaVu Sans', 'Noto Sans', sans-serif; font-size: 11pt; }
+        .name-inline { display: inline-block; border: 1pt solid #16a34a; padding: 2pt 4pt; border-radius: 3pt; }
+    """)
+
+    # 5) генерация PDF
+    pdf_io = BytesIO()
+    HTML(string=html_string, base_url=base_url, url_fetcher=weasy_url_fetcher).write_pdf(
+        pdf_io,
+        stylesheets=[extra_css],
+    )
+
+    pdf_io.seek(0)
+    # === Формируем название файла ===
+    # Базовое имя: Фамилия_Имя_id (без лишних пробелов/подчёркиваний)
+    last = (document.last_name or "").strip()
+    first = (document.first_name or "").strip()
+    parts = [p for p in [last, first, str(document.id)] if p]
+    base_name = "_".join(parts) or f"document_{document.id}"
+
+    # Unicode-вариант (красивый для современных браузеров)
+    unicode_name = f"{base_name}.pdf"
+
+    # ASCII-фолбэк для старых клиентов (IE/старые прокси): slugify без юникода
+    ascii_name = f"{slugify(base_name)}.pdf" or f"document_{document.id}.pdf"
+
+    # Заголовки ответа
+    resp = HttpResponse(pdf_io.read(), content_type="application/pdf")
+    # attachment — принудительное скачивание
+    # filename — ASCII фолбэк; filename* — RFC 5987 (UTF-8), percent-encoded
+    resp["Content-Disposition"] = (
+        f"attachment; filename={ascii_name}; filename*=UTF-8''{quote(unicode_name)}"
+    )
+    resp["X-Content-Type-Options"] = "nosniff"
+
+    return resp
 
 def home(request):
     """
