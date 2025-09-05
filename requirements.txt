@@ -1,8 +1,0 @@
-Django==5.2.5
-pdf2image==1.16.3
-Pillow==11.3.0
-pytesseract==0.3.10
-weasyprint>=62
-
-#poopler - sudo apt-get install poppler-utils
-#brew install tesseract tesseract-lang

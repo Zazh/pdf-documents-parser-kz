@@ -5,3 +5,4 @@ datas/settings.py
 staticfiles/
 media/
 Dockerfile
+reqirements.txt
