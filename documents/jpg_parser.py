@@ -4,6 +4,7 @@ import re
 import io
 import json
 import logging
+import unicodedata
 from typing import Dict, Tuple, Optional
 
 from PIL import Image, ImageEnhance, ImageOps
@@ -42,6 +43,30 @@ def normalize_date(s: str) -> str:
     return ""
 
 # ---------------------
+# ВСПОМОГАТЕЛЬНОЕ
+# ---------------------
+
+def _normalize_unicode(s: str) -> str:
+    """Нормализация юникода, чтобы буквы с диакритикой были в NFC."""
+    return unicodedata.normalize("NFC", s) if s else s
+
+def _titlecase_cyr(s: str) -> str:
+    """
+    Преобразует 'ӘБДІ-ҚАДЫР' -> 'Әбді-Қадыр', сохраняя дефисы/апострофы.
+    Работает и для латиницы.
+    """
+    if not s:
+        return s
+    parts = []
+    # разделяем, сохраняя разделители в результате
+    for tok in re.split(r"([-ʼ'’])", s):
+        if tok and tok not in "-ʼ'’":
+            parts.append(tok[:1] + tok[1:].lower())
+        else:
+            parts.append(tok)
+    return "".join(parts)
+
+# ---------------------
 # ОСНОВНОЙ ПАРСЕР ROI
 # ---------------------
 
@@ -66,6 +91,7 @@ class JPGCoordinateParser:
 
         self.coordinates = self.load_coordinates()
 
+        # PSM под поля (7 — одна строка)
         self.psm_by_field = {
             "iin": 7,
             "last_name": 7,
@@ -73,9 +99,16 @@ class JPGCoordinateParser:
             "patronymic": 7,
         }
 
+        # Вайтлист только для цифр ИИН
         self.whitelist_by_field = {
             "iin": "0123456789",
         }
+
+        # Служебные слова, которые надо убрать из ФИО (в верхнем регистре)
+        self.bad_labels = {"ТЕГІ", "ФАМИЛИЯ", "АТЫ", "ИМЯ", "ӘКЕСІНІҢ", "ОТЧЕСТВО"}
+
+        # Разрешённые символы: латиница A-Z, расширенная кириллица \u0400-\u052F, дефис и апострофы
+        self.name_keep_re = re.compile(r"[^A-Z\u0400-\u052F\-ʼ'’]")
 
     def load_coordinates(self) -> Dict[str, Tuple[float, float, float, float]]:
         """
@@ -204,7 +237,8 @@ class JPGCoordinateParser:
         psm = self.psm_by_field.get(field, self.default_psm)
         # whitelist и выбор языка
         wl = self.whitelist_by_field.get(field)
-        lang = self.lang_digits if wl else (self.lang_text + "+eng")  # текст: kaz+rus+eng; цифры: eng
+        # Текст: kaz+rus+eng; Цифры: eng
+        lang = self.lang_digits if wl else (self.lang_text + "+eng")
 
         cfg = f"--oem 1 --psm {psm}"
         if wl:
@@ -237,6 +271,8 @@ class JPGCoordinateParser:
     # --- пост-обработка текста ---
 
     def _clean(self, field: str, text: str) -> str:
+        # нормализация юникода и базовая чистка пробелов/переводов строк
+        text = _normalize_unicode(text)
         text = text.replace("\n", " ").replace("\r", " ").strip()
         text = " ".join(text.split())
         if not text:
@@ -247,11 +283,20 @@ class JPGCoordinateParser:
             return m.group(1) if m else ""
 
         if field in ("last_name", "first_name", "patronymic"):
-            # только буквы и дефисы; убираем служебные слова
-            tokens = [re.sub(r"[^A-ZА-ЯЁ-]", "", w.upper()) for w in text.split()]
-            bad = {"ТЕГІ", "ФАМИЛИЯ", "АТЫ", "ИМЯ", "ӘКЕСІНІҢ", "ОТЧЕСТВО"}
-            words = [w for w in tokens if len(w) > 1 and w not in bad]
-            return " ".join(words)
+            # Сохраняем латиницу + всю кириллицу (включая расширенную \u0400-\u052F),
+            # а также дефис и варианты апострофа.
+            up = text.upper()
+            tokens = []
+            for w in up.split():
+                w2 = self.name_keep_re.sub("", w)  # вырезаем всё, что не буквы/дефис/апостроф
+                if not w2:
+                    continue
+                if w2 in self.bad_labels:
+                    continue
+                tokens.append(w2)
+
+            cleaned = " ".join(tokens)
+            return _titlecase_cyr(cleaned)
 
         return text
 
